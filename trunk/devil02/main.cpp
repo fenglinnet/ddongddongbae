@@ -563,7 +563,7 @@ int VS(int force, int enemy, int who1, int who2, bool control)
 					else dash[0]=15;
 				dash[6]=0;
 			}
-			if(GetKey(vkey_enter)){
+			if(_GetKeyState(VK_RETURN)){
 				if(!key)
 				{
 					if(dash[6]>0)cara[0].state=5;
@@ -652,7 +652,7 @@ int VS(int force, int enemy, int who1, int who2, bool control)
 						else dash[3]=15;
 					dash[7]=0;
 				}
-				if(GetKey(vkey_tab)){
+				if(_GetKeyState(VK_TAB)){
 					if(!key2)
 					{
 						if(dash[7]>0)cara[1].state=5;
