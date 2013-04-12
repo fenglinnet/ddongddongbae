@@ -80,7 +80,7 @@ extern BOOL mouse_move;	//마우스 이동 여부
 --------------------------------*/
 
 //초기화 작업
-BOOL MainInitialize(char* window_name, BOOL use_keyboard, BOOL use_mouse, bool window_mode=false);
+BOOL MainInitialize(char* window_name, HINSTANCE hInstance, BOOL use_keyboard, BOOL use_mouse, bool window_mode=false);
 
 //윈도우 메세지 처리
 LRESULT CALLBACK WndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam);

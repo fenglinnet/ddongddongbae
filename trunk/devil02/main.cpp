@@ -59,7 +59,7 @@ int Click()
 	while(loop)
 	{
 		if(!ProcessMessage())break;
-		if(LButton)
+		if(LButton || GetKey(vkey_enter))
 		{
 			if(!key)
 			{
@@ -1173,6 +1173,7 @@ void Ending1()
 		else if(devil.score>40)rank='C';
 		else rank='D';
 	PutFontOutline(280,260,WHITE,"등급: %c",rank);
+	Render();
 	Sleep(15000);
 	if(title==0 && number==0){
 		FILE *Fp;
@@ -1218,6 +1219,7 @@ void Ending2()
 	Change(99);
 	PutFontOutline(280,200,WHITE,"끝...");
 	PutFontOutline(280,240,WHITE,"당신의 점수: %d", devil.score);
+	Render();
 	char rank;
 	if(devil.score>100)rank='P';
 		else if(devil.score>90)rank='S';
@@ -1311,7 +1313,7 @@ int _Battle()
 			PLAY_SOUND(17);
 			k=rand()%7;
 			for(int i=65;i<415;i++){
-			_DrawBarAlpha((k*50)+145,i,(k*50)+195,i,RED);
+			_DrawBarAlpha((k*50)+145,i,(k*50)+195,i + 1,RED);
 			Render();
 			}
 			for(j=0;j<7;j++)
@@ -1749,10 +1751,10 @@ int CBattle::Key()
 	int direct=8;
 	bool left, up, right, down;
 	left=up=right=down=false;
-	if(GetKey(vkey_left))left=true;
-	if(GetKey(vkey_up))up=true;
-	if(GetKey(vkey_right))right=true;
-	if(GetKey(vkey_down))down=true;
+	if(GetKey(vkey_left, 0))left=true;
+	if(GetKey(vkey_up, 0))up=true;
+	if(GetKey(vkey_right, 0))right=true;
+	if(GetKey(vkey_down, 0))down=true;
 	if(left && !up && !right && down)direct=0;
 	if(left && !up && !right && !down)direct=1;
 	if(left && up && !right && !down)direct=2;
@@ -2177,7 +2179,7 @@ int CBattle::Battle(int num)
 		_DrawBmp(&BackRect, 0, 0, 0);
 		//조작
 		dir=Key();
-		if(GetKey(vkey_enter))
+		if(GetKey(vkey_enter, 0))
 		{
 			//용사공격
 			if(!spr[0].life)continue;
@@ -2196,7 +2198,9 @@ int CBattle::Battle(int num)
 			}
 		}
 		if(vic==-1)
+		{
 			if(GetKey(vkey_esc) || LButton)win=2;
+		}
 
 		PutSpr();
 		CtrSpr();
@@ -2340,9 +2344,9 @@ void _Meeting()
 	Render();
 }
 
-int main()
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstancem, LPSTR lpCmdLine, int nShowCmd)
 {
-	if(!MainInitialize("Devil2", TRUE, TRUE, window_mode))return 0;
+	if(!MainInitialize("Devil2", hInstance, TRUE, TRUE, window_mode))return 0;
 
 	//윈도우창 이동
 	if(window_mode)

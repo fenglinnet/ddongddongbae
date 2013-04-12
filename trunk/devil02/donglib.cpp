@@ -2047,12 +2047,10 @@ CAnimation::~CAnimation()
 
 ////////////////////////////////////////////////////////////
 //초기화 작업(매번 바뀌지 않으니까 main에서 donglib로 옮겼음
-BOOL MainInitialize(char* window_name, BOOL use_keyboard, BOOL use_mouse, bool window_mode)
+BOOL MainInitialize(char* window_name, HINSTANCE hInstance, BOOL use_keyboard, BOOL use_mouse, bool window_mode)
 {
 	jdd=CreateDirectDraw();
 	jre=CreateDXResourceManager(jdd);
-
-	HINSTANCE hInstance=(HINSTANCE)0x00400000;
 
 	WNDCLASS wc={0};
 	wc.hIcon=LoadIcon(hInstance,"ICON.ico");
