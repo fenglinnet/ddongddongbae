@@ -341,8 +341,8 @@ void StartGame()
 		case 3: number=2;
 				_Story(164,174,0);
 				_MidiStop();
-				_PlayAVI("ending.avi");
-				_MidiPlay("music//open.mid", true);
+				//_PlayAVI("ending.avi");
+				//_MidiPlay("music//open.mid", true);
 				Title(); herowin=false;
 				Change(0);mode=0;
 				break;
