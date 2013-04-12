@@ -1,18 +1,20 @@
-#define WHITE RGB2(255,255,255)
-#define BLACK RGB2(0,0,0)
-#define RED RGB2(255,0,0)
-#define GREEN RGB2(0,255,0)
-#define BLUE RGB2(0,0,255)
-#define YELLOW RGB2(255,255,0)
+FILE* fp;
+JFont font20;
+HSNDOBJ Sound[100];
+
+#define WHITE JColor(255,255,255)
+#define BLACK JColor(0,0,0)
+#define RED JColor(255,0,0)
+#define GREEN JColor(0,255,0)
+#define BLUE JColor(0,0,255)
+#define YELLOW JColor(255,255,0)
 #define LOCK if(_LockScreen())_UnlockScreen()
-#define PRC MSG msg; if ( PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE) ){if ( !GetMessage(&msg, NULL, 0, 0) ) return msg.wParam;TranslateMessage( &msg );DispatchMessage( &msg );}else
-#define BOX1 SetRect(&BackRect, 100, 60, 600, 160); _DrawBmp(BackRect, 70, 190, BmpScreen[9], DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT)
-#define SCENE SetRect(&BackRect, 0, 0, 640, 480); _DrawBmp(BackRect, 0, 0, BmpScreen[0], DDBLTFAST_NOCOLORKEY | DDBLTFAST_WAIT)
-#define MSND if(!sndd)_Play(movesnd[cara[0].kind])
-#define MSND2 if(!sndd)_Play(movesnd[cara[1].kind])
+#define BOX1 SetRect(&BackRect, 100, 60, 600, 160); _DrawBmp(&BackRect, 70, 190, 9)
+#define MSND if(!sndd)PLAY_SOUND(movesnd[cara[0].kind])
+#define MSND2 if(!sndd)PLAY_SOUND(movesnd[cara[1].kind])
 #define SMAX 50
-#define ENSHOT for(int i2=5;i2<15;i2++)if(!spr[i2].life)break; if(i2<15)
-#define ENSPR for(int i2=15;i2<SMAX;i2++)if(!spr[i2].life)break; if(i2<SMAX)
+#define ENSHOT int i2; for(i2=5;i2<15;i2++)if(!spr[i2].life)break; if(i2<15)
+#define ENSPR int i2; for(i2=15;i2<SMAX;i2++)if(!spr[i2].life)break; if(i2<SMAX)
 #define MONSTERS 23
 #define ENEMYS 9
 
@@ -20,14 +22,14 @@ int Nstory[]={8,13,17,21,23,26,28,35,38};
 int Help[]={99,0,1,99,0,2,2,0};
 char *general[]={"과묵","초쨉실","100프로","왕미모","은마녀","의문의 바보"};
 char *BattleBack[]={
-	"DATA//back6.bmp","DATA//back5.bmp","DATA//back4.bmp",
-	"DATA//back3.bmp","DATA//back2.bmp","DATA//back1.bmp",
-	"DATA//back1.bmp","DATA//back1.bmp","DATA//back7.bmp"};
+	"DATA//back6.jpg","DATA//back5.jpg","DATA//back4.jpg",
+	"DATA//back3.jpg","DATA//back2.jpg","DATA//back1.jpg",
+	"DATA//back1.jpg","DATA//back1.jpg","DATA//back7.jpg"};
 char *Carac[]={
-	"DATA//Cbang.bmp","DATA//Cbate.bmp","DATA//Cbow.bmp",
-	"DATA//Cdark.bmp","DATA//Cknight.bmp","DATA//Cgold.bmp",
-	"DATA//Chero.bmp","DATA//Chero2.bmp","DATA//Cmage.bmp",
-	"DATA//Cghost.bmp","DATA//Czombie.bmp"};
+	"DATA//Cbang.png","DATA//Cbate.png","DATA//Cbow.png",
+	"DATA//Cdark.png","DATA//Cknight.png","DATA//Cgold.png",
+	"DATA//Chero.png","DATA//Chero2.png","DATA//Cmage.png",
+	"DATA//Cghost.png","DATA//Czombie.png"};
 int BattleMon[]={0,4,4,6,8,8,8,0,
 				 4,0,2,4,4,4,10,20,
 				 0,2,8,6,6,8,8,0};
@@ -237,9 +239,8 @@ char *snr1[]={
 	"13","한 무더운 여름날의 이야기였습니다.","","",
 	};
 
-BOOL LeftButton, RightButton, ReplayFlag, Quit=false, key, key2, first;
-extern HSNDOBJ Sound[];
-int mode=0, Frame=0, RFrame=0, Count=0, Select=0, number, boss, help, title, combo[5];
+BOOL Quit=false, key, key2, first;
+int mode=0, Frame=0, RFrame=0, Select=0, number, boss, help, title, combo[5];
 RECT BackRect;
 
 typedef struct{
@@ -251,8 +252,8 @@ Devil devil;
 typedef struct{
 	bool turn, life;
 	int hp, x, y, kind;
-}Unit;
-Unit monster[7];
+}Units;
+Units monster[7];
 
 typedef struct{
 	int x, state, dam, kind;
@@ -299,3 +300,78 @@ public:
 };
 
 CBattle spr[SMAX];
+
+void PutFontOutline(int x, int y, JColor jc, char* text, ...)
+{
+    char buffer[256];
+
+    va_list argptr;
+    va_start(argptr, text);
+    vsprintf(buffer,text,argptr);
+
+	jdd->DrawText(backbuffer,buffer,font20,x+1,y,JColor(0,0,0));
+	jdd->DrawText(backbuffer,buffer,font20,x-1,y,JColor(0,0,0));
+	jdd->DrawText(backbuffer,buffer,font20,x,y+1,JColor(0,0,0));
+	jdd->DrawText(backbuffer,buffer,font20,x,y-1,JColor(0,0,0));
+	jdd->DrawText(backbuffer,buffer,font20,x,y,jc);
+}
+
+void LoadPic(int num, char* stream, bool transparent=true)
+{
+	jdd->DeleteSurface(StrAdd("P%d", num));
+
+	bool test;
+	if(transparent)
+	{
+		JPictureInfo pi;
+		pi.SetColorKey(JColor(0,0,255));
+		test = jdd->LoadPicture(StrAdd("P%d", num),stream,&pi,true);
+	}
+	else jdd->LoadPicture(StrAdd("P%d", num),stream, NULL, true);
+}
+
+void _DrawBmp(RECT* rect, int x, int y, int num)
+{
+	if(num < 0 || num >9)return;
+
+	if(rect)jdd->DrawPicture(backbuffer,StrAdd("P%d", num),x,y,rect);
+	else jdd->DrawPicture(backbuffer,StrAdd("P%d", num),x,y,NULL);
+}
+
+void _Pixel( int x, int y, JColor jc)
+{
+	JBrush tmp_brush;
+	tmp_brush=jdd->CreateBrush(jc);
+	jdd->DrawLine(backbuffer,tmp_brush,x,y,x,y,1);
+	jdd->DeleteBrush(tmp_brush);
+}
+
+void _DrawBox( int x1, int y1, int x2, int y2, JColor jc)
+{
+	JBrush tmp_brush;
+	tmp_brush=jdd->CreateBrush(jc);
+	RECT tmp_rect;
+	SetRect(&tmp_rect,x1,y1,x2,y2);
+	jdd->DrawRect(backbuffer,tmp_brush,&tmp_rect,1);
+	jdd->DeleteBrush(tmp_brush);
+}
+
+void _DrawBar( int x1, int y1, int x2, int y2, JColor jc)
+{
+	JBrush tmp_brush;
+	tmp_brush=jdd->CreateBrush(jc);
+	RECT tmp_rect;
+	SetRect(&tmp_rect,x1,y1,x2,y2);
+	jdd->DrawRect(backbuffer,tmp_brush,&tmp_rect);
+	jdd->DeleteBrush(tmp_brush);
+}
+
+void _DrawBarAlpha( int x1, int y1, int x2, int y2, JColor jc)
+{
+	JBrush tmp_brush;
+	tmp_brush=jdd->CreateBrush(jc,0.5f);
+	RECT tmp_rect;
+	SetRect(&tmp_rect,x1,y1,x2,y2);
+	jdd->DrawRect(backbuffer,tmp_brush,&tmp_rect);
+	jdd->DeleteBrush(tmp_brush);
+}
