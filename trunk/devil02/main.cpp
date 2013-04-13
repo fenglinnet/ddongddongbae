@@ -25,6 +25,7 @@ void _Delay( DWORD count )
 void Render()
 {
 	jdd->Render();
+	_Delay(1);
 }
 
 int SColor1(int hp)
@@ -1675,8 +1676,8 @@ void turn(int who)
 			PutFontOutline(230,200,WHITE,"±×³É ½°");
 			break;
 	}
-	for(int i=230;i<410;i++){
-		_DrawBar(i,260,i+1,280,JColor(i-200,0,0));
+	for(int i=230;i<410;i+=3){
+		_DrawBar(i,260,i+3,280,JColor(i-200,0,0));
 		Sleep(10);
 		Render();
 	}
